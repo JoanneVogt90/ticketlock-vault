@@ -7,18 +7,35 @@ import "hardhat-deploy";
 import "hardhat-gas-reporter";
 import type { HardhatUserConfig } from "hardhat/config";
 import { vars as _vars } from "hardhat/config";
+import "dotenv/config";
 import "solidity-coverage";
 
 import "./tasks/accounts";
-import "./tasks/FHECounter";
+import "./tasks/TicketVault";
 
 // Run 'npx hardhat vars setup' to see the list of variables that need to be set
 
 // Provide a safe fallback for Hardhat <2.22 where `vars` is not available
 const vars = (_vars as any) ?? { get: (_name: string, fallback = "") => fallback };
 
+// Prefer environment variables first; fallback to hardhat vars when useful
 const MNEMONIC: string = vars.get("MNEMONIC", "test test test test test test test test test test test junk");
-const INFURA_API_KEY: string = vars.get("INFURA_API_KEY", "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
+const INFURA_API_KEY: string = process.env.INFURA_API_KEY ?? vars.get("INFURA_API_KEY", "");
+const SEPOLIA_RPC_URL: string =
+  process.env.SEPOLIA_RPC_URL ?? (INFURA_API_KEY ? `https://sepolia.infura.io/v3/${INFURA_API_KEY}` : "https://rpc.sepolia.org");
+const ETHERSCAN_API_KEY: string = process.env.ETHERSCAN_API_KEY ?? vars.get("ETHERSCAN_API_KEY", "");
+const RAW_PRIVATE_KEY: string | undefined = process.env.PRIVATE_KEY || process.env.SEPOLIA_PRIVATE_KEY || undefined;
+const PRIVATE_KEY: string | undefined = RAW_PRIVATE_KEY
+  ? RAW_PRIVATE_KEY.startsWith("0x")
+    ? RAW_PRIVATE_KEY
+    : `0x${RAW_PRIVATE_KEY}`
+  : undefined;
+const RAW_LOCAL_PRIVATE_KEY: string | undefined = process.env.LOCAL_PRIVATE_KEY || undefined;
+const LOCAL_PRIVATE_KEY: string | undefined = RAW_LOCAL_PRIVATE_KEY
+  ? RAW_LOCAL_PRIVATE_KEY.startsWith("0x")
+    ? RAW_LOCAL_PRIVATE_KEY
+    : `0x${RAW_LOCAL_PRIVATE_KEY}`
+  : undefined;
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
@@ -27,7 +44,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      sepolia: vars.get("ETHERSCAN_API_KEY", ""),
+      sepolia: ETHERSCAN_API_KEY,
     },
   },
   gasReporter: {
@@ -43,6 +60,11 @@ const config: HardhatUserConfig = {
       hardfork: "cancun",
       chainId: 31337,
     },
+    localhost: {
+      url: process.env.LOCAL_RPC_URL || "http://127.0.0.1:8545",
+      accounts: LOCAL_PRIVATE_KEY ? [LOCAL_PRIVATE_KEY] : undefined,
+      chainId: 31337,
+    },
     anvil: {
       accounts: {
         mnemonic: MNEMONIC,
@@ -53,13 +75,16 @@ const config: HardhatUserConfig = {
       url: "http://localhost:8545",
     },
     sepolia: {
-      accounts: {
-        mnemonic: MNEMONIC,
-        path: "m/44'/60'/0'/0/",
-        count: 10,
-      },
+      accounts: PRIVATE_KEY
+        ? [PRIVATE_KEY]
+        : {
+            mnemonic: MNEMONIC,
+            path: "m/44'/60'/0'/0/",
+            count: 10,
+          },
       chainId: 11155111,
-      url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
+      url: SEPOLIA_RPC_URL,
+      timeout: 120000,
     },
   },
   paths: {

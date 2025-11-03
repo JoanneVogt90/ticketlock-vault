@@ -1,34 +1,40 @@
 {
-  "name": "fhevm-react-template",
-  "version": "0.3.0",
+  "name": "ticketlock-vault-frontend",
+  "version": "1.0.0",
   "private": true,
   "license": "BSD-3-Clause-Clear",
-  "homepage": "https://github.com/zama-ai/fhevm-react-template/blob/main/packages/site/README.md",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zama-ai/fhevm-react-template.git"
-  },
   "scripts": {
     "clean": "rimraf .next",
-    "dev:mock": "npm run ishhrunning && npm run clean && npm run genabi && next dev --turbopack",
-    "dev": "npm run clean && npm run genabi && next dev --turbopack",
-    "dev-webpack": "npm run clean && npm run genabi && next dev",
+    "dev:mock": "npm run ishhrunning && npm run clean && npm run genabi && next dev --turbopack -H 0.0.0.0",
+    "dev": "npm run clean && npm run genabi && next dev --turbopack -H 0.0.0.0",
+    "dev-webpack": "npm run clean && npm run genabi && next dev -H 0.0.0.0",
     "genabi": "node ./scripts/genabi.mjs",
     "ishhrunning": "node ./scripts/is-hardhat-node-running.mjs",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -H 0.0.0.0",
     "lint": "next lint"
   },
   "dependencies": {
     "@zama-fhe/relayer-sdk": "0.2.0",
+    "@rainbow-me/rainbowkit": "^2.2.9",
+    "@tanstack/react-query": "^5.83.0",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-toast": "^1.2.14",
+    "@radix-ui/react-tooltip": "^1.2.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "ethers": "^6.13.4",
     "idb": "^8.0.3",
+    "lucide-react": "^0.462.0",
     "next": "^15.4.2",
+    "qrcode.react": "^4.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "sonner": "^1.7.4",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "viem": "^2.39.0",
+    "wagmi": "^2.19.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
