@@ -163,6 +163,8 @@ contract TicketVault is SepoliaConfig {
         require(newOwner != msg.sender, "Cannot transfer to self");
 
         address previousOwner = _tickets[ticketId].owner;
+        
+        // Update ownership first (checks-effects-interactions pattern)
         _tickets[ticketId].owner = newOwner;
 
         // Remove from previous owner's list
@@ -178,7 +180,7 @@ contract TicketVault is SepoliaConfig {
         // Add to new owner's list
         _ownerTickets[newOwner].push(ticketId);
 
-        // Update FHE permissions for new owner
+        // Update FHE permissions for new owner (interactions last)
         FHE.allow(_tickets[ticketId].encryptedSeatNumber, newOwner);
         FHE.allow(_tickets[ticketId].isLocked, newOwner);
 
