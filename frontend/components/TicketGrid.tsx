@@ -13,6 +13,7 @@ export const TicketGrid = () => {
     tickets,
     isLoading,
     isCreating,
+    isDeployed,
     createTicket,
     unlockTicket,
     lockTicket,
@@ -20,6 +21,7 @@ export const TicketGrid = () => {
     refreshTickets,
     decryptingTickets,
     togglingTickets,
+    fhevmStatus,
   } = useTicketVault();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -58,6 +60,23 @@ export const TicketGrid = () => {
     );
   }
 
+  if (!isDeployed) {
+    return (
+      <section className="py-20 px-4">
+        <div className="container mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+            Your Ticket Vault
+          </h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
+            Contract not deployed on this network. Please switch to a supported network.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  const isFhevmReady = fhevmStatus === "ready";
+
   return (
     <section className="py-20 px-4">
       <div className="container mx-auto">
@@ -68,16 +87,26 @@ export const TicketGrid = () => {
           <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
             Securely manage your event tickets. Lock to protect, unlock to verify entry.
           </p>
+          {!isFhevmReady && (
+            <p className="text-yellow-500 text-sm mb-4">
+              FHEVM Status: {fhevmStatus} - Please wait for encryption to be ready...
+            </p>
+          )}
           <div className="flex justify-center gap-4">
             <Button
               onClick={handleCreateSampleTicket}
-              disabled={isCreating}
+              disabled={isCreating || !isFhevmReady}
               className="gap-2"
             >
               {isCreating ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Creating...
+                </>
+              ) : !isFhevmReady ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading FHEVM...
                 </>
               ) : (
                 <>
