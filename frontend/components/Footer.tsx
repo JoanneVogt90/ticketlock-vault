@@ -1,6 +1,6 @@
 "use client";
 
-import { Shield, Github, Twitter } from "lucide-react";
+import { Shield } from "lucide-react";
 import { Logo } from "./Logo";
 
 export const Footer = () => {
@@ -33,17 +33,6 @@ export const Footer = () => {
             </ul>
           </div>
           
-          <div>
-            <h3 className="font-semibold text-foreground mb-4">Connect</h3>
-            <div className="flex gap-4">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Github className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
-            </div>
-          </div>
         </div>
         
         <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
