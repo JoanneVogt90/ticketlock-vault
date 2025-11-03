@@ -90,6 +90,10 @@ contract TicketVault is SepoliaConfig {
         externalEuint32 encryptedSeat,
         bytes calldata seatProof
     ) external returns (uint256) {
+        require(bytes(eventName).length > 0, "Event name cannot be empty");
+        require(bytes(venue).length > 0, "Venue cannot be empty");
+        require(bytes(date).length > 0, "Date cannot be empty");
+        
         uint256 ticketId = _ticketCount;
         _ticketCount++;
 
