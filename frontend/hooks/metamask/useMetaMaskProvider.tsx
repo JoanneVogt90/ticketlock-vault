@@ -9,6 +9,7 @@ import {
 } from "react";
 import { Eip1193Provider, ethers } from "ethers";
 import { useEip6963 } from "./useEip6963";
+import { useAccount as useWagmiAccount } from "wagmi";
 
 interface ProviderConnectInfo {
   readonly chainId: string;
@@ -55,6 +56,9 @@ export interface UseMetaMaskState {
 
 function useMetaMaskInternal(): UseMetaMaskState {
   const { error: eip6963Error, providers } = useEip6963();
+  // Sync with wagmi connection state
+  const { address: wagmiAddress, isConnected: wagmiConnected, chainId: wagmiChainId } = useWagmiAccount();
+  
   const [_currentProvider, _setCurrentProvider] = useState<
     Eip1193ProviderWithEvent | undefined
   >(undefined);
@@ -75,6 +79,31 @@ function useMetaMaskInternal(): UseMetaMaskState {
   const metaMaskProviderRef = useRef<Eip1193ProviderWithEvent | undefined>(
     undefined
   );
+  
+  // Sync accounts from wagmi when connected via RainbowKit
+  useEffect(() => {
+    if (wagmiConnected && wagmiAddress && _currentProvider) {
+      // Re-fetch accounts when wagmi reports connected
+      _currentProvider.request({ method: "eth_accounts" }).then((accs: string[]) => {
+        if (accs.length > 0) {
+          _setAccounts(accs);
+        } else if (wagmiAddress) {
+          // Fallback: use wagmi address if eth_accounts returns empty
+          _setAccounts([wagmiAddress]);
+        }
+      }).catch(() => {
+        // Fallback to wagmi address
+        if (wagmiAddress) {
+          _setAccounts([wagmiAddress]);
+        }
+      });
+      
+      // Also sync chainId from wagmi if available
+      if (wagmiChainId && !chainId) {
+        _setChainId(wagmiChainId);
+      }
+    }
+  }, [wagmiConnected, wagmiAddress, wagmiChainId, _currentProvider, chainId]);
 
   const hasProvider = Boolean(_currentProvider);
   const hasAccounts = (accounts?.length ?? 0) > 0;

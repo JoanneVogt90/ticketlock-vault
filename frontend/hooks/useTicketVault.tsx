@@ -136,8 +136,16 @@ export const useTicketVault = () => {
   // Create a new ticket
   const createTicket = useCallback(
     async (eventName: string, venue: string, date: string, seatNumber: number) => {
-      if (!ticketVault.address || !fhevmInstance || !ethersSigner) {
-        console.error("Cannot create ticket: missing dependencies");
+      if (!ticketVault.address) {
+        console.error("Cannot create ticket: contract not deployed on this network");
+        return;
+      }
+      if (!fhevmInstance) {
+        console.error("Cannot create ticket: FHEVM instance not ready");
+        return;
+      }
+      if (!ethersSigner) {
+        console.error("Cannot create ticket: wallet not connected (ethersSigner is undefined)");
         return;
       }
 
