@@ -80,6 +80,7 @@ export const useTicketVault = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [decryptingTickets, setDecryptingTickets] = useState<Set<number>>(new Set());
   const [togglingTickets, setTogglingTickets] = useState<Set<number>>(new Set());
+  const [error, setError] = useState<string | null>(null);
 
   const ticketVault = useMemo(() => getTicketVaultByChainId(chainId), [chainId]);
 
@@ -95,6 +96,7 @@ export const useTicketVault = () => {
     }
 
     setIsLoading(true);
+    setError(null);
     try {
       const contract = new ethers.Contract(
         ticketVault.address,
@@ -120,8 +122,10 @@ export const useTicketVault = () => {
 
       const fetchedTickets = await Promise.all(ticketPromises);
       setTickets(fetchedTickets);
-    } catch (error) {
-      console.error("Failed to fetch tickets:", error);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch tickets";
+      console.error("Failed to fetch tickets:", err);
+      setError(errorMessage);
       setTickets([]);
     } finally {
       setIsLoading(false);
@@ -137,19 +141,26 @@ export const useTicketVault = () => {
   const createTicket = useCallback(
     async (eventName: string, venue: string, date: string, seatNumber: number) => {
       if (!ticketVault.address) {
-        console.error("Cannot create ticket: contract not deployed on this network");
+        const msg = "Cannot create ticket: contract not deployed on this network";
+        console.error(msg);
+        setError(msg);
         return;
       }
       if (!fhevmInstance) {
-        console.error("Cannot create ticket: FHEVM instance not ready");
+        const msg = "Cannot create ticket: FHEVM instance not ready";
+        console.error(msg);
+        setError(msg);
         return;
       }
       if (!ethersSigner) {
-        console.error("Cannot create ticket: wallet not connected (ethersSigner is undefined)");
+        const msg = "Cannot create ticket: wallet not connected";
+        console.error(msg);
+        setError(msg);
         return;
       }
 
       setIsCreating(true);
+      setError(null);
       try {
         const contract = new ethers.Contract(
           ticketVault.address,
@@ -176,8 +187,10 @@ export const useTicketVault = () => {
 
         // Refresh tickets after creation
         await refreshTickets();
-      } catch (error) {
-        console.error("Failed to create ticket:", error);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Failed to create ticket";
+        console.error("Failed to create ticket:", err);
+        setError(errorMessage);
       } finally {
         setIsCreating(false);
       }
@@ -342,5 +355,6 @@ export const useTicketVault = () => {
     decryptingTickets,
     togglingTickets,
     fhevmStatus,
+    error,
   };
 };
