@@ -35,6 +35,7 @@ export const TicketCard = ({
   const displayOwner = owner ? `${owner.slice(0, 6)}...${owner.slice(-4)}` : "Unknown";
   const isUnlocked = isLocked === false;
   const needsDecryption = seatNumber === null || isLocked === null;
+  const lockStatusText = isLocked === null ? "Unknown" : isLocked ? "Locked" : "Unlocked";
 
   return (
     <Card className="relative overflow-hidden bg-[var(--gradient-card)] border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-[var(--shadow-glow)] group">
@@ -94,6 +95,19 @@ export const TicketCard = ({
             <User className="h-4 w-4 text-accent" />
             <span className="truncate">Owner: {displayOwner}</span>
           </div>
+
+          {!needsDecryption && (
+            <div className="flex items-center gap-2 text-sm">
+              {isLocked ? (
+                <Lock className="h-4 w-4 text-destructive" />
+              ) : (
+                <Unlock className="h-4 w-4 text-green-500" />
+              )}
+              <span className={isLocked ? "text-destructive" : "text-green-500"}>
+                Status: {lockStatusText}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}
@@ -104,6 +118,7 @@ export const TicketCard = ({
               disabled={isDecrypting}
               variant="outline"
               className="w-full"
+              aria-label="Decrypt ticket data to view seat number and lock status"
             >
               {isDecrypting ? (
                 <>
@@ -124,6 +139,7 @@ export const TicketCard = ({
             disabled={isToggling || needsDecryption}
             variant={isUnlocked ? "secondary" : "default"}
             className="w-full"
+            aria-label={isUnlocked ? "Lock ticket to hide QR code" : "Unlock ticket to reveal QR code"}
           >
             {isToggling ? (
               <>
