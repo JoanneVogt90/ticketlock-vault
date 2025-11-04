@@ -187,4 +187,87 @@ describe("TicketVault", function () {
     expect(bobTickets.length).to.eq(1);
     expect(bobTickets[0]).to.eq(0);
   });
+
+  it("should reject ticket creation with empty event name", async function () {
+    const encryptedSeat = await fhevm
+      .createEncryptedInput(ticketVaultContractAddress, signers.alice.address)
+      .add32(1)
+      .encrypt();
+
+    await expect(
+      ticketVaultContract
+        .connect(signers.alice)
+        .createTicket("", "Test Venue", "2025-01-01", encryptedSeat.handles[0], encryptedSeat.inputProof),
+    ).to.be.revertedWith("Event name cannot be empty");
+  });
+
+  it("should reject ticket creation with empty venue", async function () {
+    const encryptedSeat = await fhevm
+      .createEncryptedInput(ticketVaultContractAddress, signers.alice.address)
+      .add32(1)
+      .encrypt();
+
+    await expect(
+      ticketVaultContract
+        .connect(signers.alice)
+        .createTicket("Test Event", "", "2025-01-01", encryptedSeat.handles[0], encryptedSeat.inputProof),
+    ).to.be.revertedWith("Venue cannot be empty");
+  });
+
+  it("should reject ticket creation with empty date", async function () {
+    const encryptedSeat = await fhevm
+      .createEncryptedInput(ticketVaultContractAddress, signers.alice.address)
+      .add32(1)
+      .encrypt();
+
+    await expect(
+      ticketVaultContract
+        .connect(signers.alice)
+        .createTicket("Test Event", "Test Venue", "", encryptedSeat.handles[0], encryptedSeat.inputProof),
+    ).to.be.revertedWith("Date cannot be empty");
+  });
+
+  it("should reject transfer to zero address", async function () {
+    const encryptedSeat = await fhevm
+      .createEncryptedInput(ticketVaultContractAddress, signers.alice.address)
+      .add32(1)
+      .encrypt();
+
+    await ticketVaultContract
+      .connect(signers.alice)
+      .createTicket("Test Event", "Test Venue", "2025-01-01", encryptedSeat.handles[0], encryptedSeat.inputProof);
+
+    await expect(
+      ticketVaultContract.connect(signers.alice).transferTicket(0, "0x0000000000000000000000000000000000000000"),
+    ).to.be.revertedWith("Invalid new owner");
+  });
+
+  it("should reject transfer to self", async function () {
+    const encryptedSeat = await fhevm
+      .createEncryptedInput(ticketVaultContractAddress, signers.alice.address)
+      .add32(1)
+      .encrypt();
+
+    await ticketVaultContract
+      .connect(signers.alice)
+      .createTicket("Test Event", "Test Venue", "2025-01-01", encryptedSeat.handles[0], encryptedSeat.inputProof);
+
+    await expect(
+      ticketVaultContract.connect(signers.alice).transferTicket(0, signers.alice.address),
+    ).to.be.revertedWith("Cannot transfer to self");
+  });
+
+  it("should reject operations on non-existent ticket", async function () {
+    await expect(ticketVaultContract.connect(signers.alice).unlockTicket(999)).to.be.revertedWith(
+      "Ticket does not exist",
+    );
+
+    await expect(ticketVaultContract.connect(signers.alice).lockTicket(999)).to.be.revertedWith(
+      "Ticket does not exist",
+    );
+
+    await expect(
+      ticketVaultContract.connect(signers.alice).transferTicket(999, signers.bob.address),
+    ).to.be.revertedWith("Ticket does not exist");
+  });
 });
