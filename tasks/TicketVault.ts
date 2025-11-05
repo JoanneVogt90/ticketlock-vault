@@ -291,3 +291,34 @@ task("task:lock-ticket", "Locks a ticket")
     console.log(`tx:${tx.hash} status=${receipt?.status}`);
     console.log(`Ticket #${ticketId} locked!`);
   });
+
+/**
+ * Example:
+ *   - npx hardhat --network localhost task:get-all-tickets
+ *   - npx hardhat --network sepolia task:get-all-tickets
+ */
+task("task:get-all-tickets", "Gets total ticket count and summary")
+  .addOptionalParam("address", "Optionally specify the TicketVault contract address")
+  .setAction(async function (taskArguments: TaskArguments, hre) {
+    const { ethers, deployments } = hre;
+
+    const TicketVaultDeployment = taskArguments.address
+      ? { address: taskArguments.address }
+      : await deployments.get("TicketVault");
+    console.log(`TicketVault: ${TicketVaultDeployment.address}`);
+
+    const ticketVaultContract = await ethers.getContractAt("TicketVault", TicketVaultDeployment.address);
+
+    const totalCount = await ticketVaultContract.getTicketCount();
+    console.log(`\nTotal tickets created: ${totalCount}`);
+
+    if (totalCount > 0) {
+      console.log(`\nTicket Summary:`);
+      for (let i = 0; i < totalCount; i++) {
+        const metadata = await ticketVaultContract.getTicketMetadata(i);
+        if (metadata.exists) {
+          console.log(`  Ticket #${i}: ${metadata.eventName} at ${metadata.venue}`);
+        }
+      }
+    }
+  });
