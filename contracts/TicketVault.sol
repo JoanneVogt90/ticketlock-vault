@@ -126,11 +126,12 @@ contract TicketVault is SepoliaConfig {
     /// @notice Unlocks a ticket (sets isLocked to false)
     /// @param ticketId The ticket ID to unlock
     function unlockTicket(uint256 ticketId) external {
-        require(_tickets[ticketId].exists, "Ticket does not exist");
-        require(_tickets[ticketId].owner == msg.sender, "Not ticket owner");
+        Ticket storage ticket = _tickets[ticketId];
+        require(ticket.exists, "Ticket does not exist");
+        require(ticket.owner == msg.sender, "Not ticket owner");
 
         ebool unlocked = FHE.asEbool(false);
-        _tickets[ticketId].isLocked = unlocked;
+        ticket.isLocked = unlocked;
 
         FHE.allowThis(unlocked);
         FHE.allow(unlocked, msg.sender);
@@ -141,11 +142,12 @@ contract TicketVault is SepoliaConfig {
     /// @notice Locks a ticket (sets isLocked to true)
     /// @param ticketId The ticket ID to lock
     function lockTicket(uint256 ticketId) external {
-        require(_tickets[ticketId].exists, "Ticket does not exist");
-        require(_tickets[ticketId].owner == msg.sender, "Not ticket owner");
+        Ticket storage ticket = _tickets[ticketId];
+        require(ticket.exists, "Ticket does not exist");
+        require(ticket.owner == msg.sender, "Not ticket owner");
 
         ebool locked = FHE.asEbool(true);
-        _tickets[ticketId].isLocked = locked;
+        ticket.isLocked = locked;
 
         FHE.allowThis(locked);
         FHE.allow(locked, msg.sender);
