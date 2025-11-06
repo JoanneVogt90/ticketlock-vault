@@ -17,6 +17,7 @@ contract TicketVault is SepoliaConfig {
         ebool isLocked;
         address owner;
         bool exists;
+        uint256 createdAt;
     }
 
     /// @notice Mapping from ticket ID to Ticket
@@ -55,10 +56,11 @@ contract TicketVault is SepoliaConfig {
         string memory venue,
         string memory date,
         address owner,
-        bool exists
+        bool exists,
+        uint256 createdAt
     ) {
         Ticket storage ticket = _tickets[ticketId];
-        return (ticket.eventName, ticket.venue, ticket.date, ticket.owner, ticket.exists);
+        return (ticket.eventName, ticket.venue, ticket.date, ticket.owner, ticket.exists, ticket.createdAt);
     }
 
     /// @notice Returns the encrypted seat number handle
@@ -107,7 +109,8 @@ contract TicketVault is SepoliaConfig {
             encryptedSeatNumber: seatNumber,
             isLocked: locked,
             owner: msg.sender,
-            exists: true
+            exists: true,
+            createdAt: block.timestamp
         });
 
         _ownerTickets[msg.sender].push(ticketId);
