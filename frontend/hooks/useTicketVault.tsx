@@ -23,6 +23,7 @@ export interface Ticket {
   encryptedLockHandle: string | null;
   decryptedSeat: number | null;
   decryptedLock: boolean | null;
+  createdAt: number;
 }
 
 interface TicketVaultInfo {
@@ -109,14 +110,15 @@ export const useTicketVault = () => {
         const metadata = await contract.getTicketMetadata(id);
         return {
           id: Number(id),
-          eventName: metadata.eventName,
-          venue: metadata.venue,
-          date: metadata.date,
-          owner: metadata.owner,
+          eventName: metadata[0],
+          venue: metadata[1],
+          date: metadata[2],
+          owner: metadata[3],
           encryptedSeatHandle: null,
           encryptedLockHandle: null,
           decryptedSeat: null,
           decryptedLock: null,
+          createdAt: Number(metadata[5]),
         } as Ticket;
       });
 

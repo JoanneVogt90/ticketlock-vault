@@ -13,6 +13,7 @@ interface TicketCardProps {
   seatNumber: number | null;
   isLocked: boolean | null;
   owner: string;
+  createdAt?: number;
   isDecrypting: boolean;
   isToggling: boolean;
   onDecrypt: () => void;
@@ -27,6 +28,7 @@ export const TicketCard = ({
   seatNumber,
   isLocked,
   owner,
+  createdAt,
   isDecrypting,
   isToggling,
   onDecrypt,
@@ -36,6 +38,18 @@ export const TicketCard = ({
   const isUnlocked = isLocked === false;
   const needsDecryption = seatNumber === null || isLocked === null;
   const lockStatusText = isLocked === null ? "Unknown" : isLocked ? "Locked" : "Unlocked";
+  
+  const formatCreatedAt = (timestamp?: number) => {
+    if (!timestamp) return null;
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleDateString("en-US", { 
+      year: "numeric", 
+      month: "short", 
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  };
 
   return (
     <Card className="relative overflow-hidden bg-[var(--gradient-card)] border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-[var(--shadow-glow)] group">
@@ -106,6 +120,12 @@ export const TicketCard = ({
               <span className={isLocked ? "text-destructive" : "text-green-500"}>
                 Status: {lockStatusText}
               </span>
+            </div>
+          )}
+
+          {createdAt && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
+              <span>Created: {formatCreatedAt(createdAt)}</span>
             </div>
           )}
         </div>
