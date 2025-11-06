@@ -66,11 +66,12 @@ describe("TicketVault", function () {
 
     // Verify ticket metadata
     const metadata = await ticketVaultContract.getTicketMetadata(0);
-    expect(metadata.eventName).to.eq(eventName);
-    expect(metadata.venue).to.eq(venue);
-    expect(metadata.date).to.eq(date);
-    expect(metadata.owner).to.eq(signers.alice.address);
-    expect(metadata.exists).to.eq(true);
+    expect(metadata[0]).to.eq(eventName); // eventName
+    expect(metadata[1]).to.eq(venue); // venue
+    expect(metadata[2]).to.eq(date); // date
+    expect(metadata[3]).to.eq(signers.alice.address); // owner
+    expect(metadata[4]).to.eq(true); // exists
+    expect(metadata[5]).to.be.gt(0); // createdAt
 
     // Verify owner tickets
     const ownerTickets = await ticketVaultContract.getOwnerTickets(signers.alice.address);
@@ -176,7 +177,7 @@ describe("TicketVault", function () {
 
     // Verify ownership changed
     const metadata = await ticketVaultContract.getTicketMetadata(0);
-    expect(metadata.owner).to.eq(signers.bob.address);
+    expect(metadata[3]).to.eq(signers.bob.address); // owner
 
     // Alice should no longer have the ticket
     const aliceTickets = await ticketVaultContract.getOwnerTickets(signers.alice.address);
