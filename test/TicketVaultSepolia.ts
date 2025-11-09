@@ -77,9 +77,10 @@ describe("TicketVaultSepolia", function () {
 
     progress(`Call TicketVault.getTicketMetadata(${ticketId})...`);
     const metadata = await ticketVaultContract.getTicketMetadata(ticketId);
-    expect(metadata.eventName).to.eq(eventName);
-    expect(metadata.owner).to.eq(signers.alice.address);
-    progress(`Ticket metadata: ${metadata.eventName} at ${metadata.venue}`);
+    expect(metadata[0]).to.eq(eventName); // eventName
+    expect(metadata[3]).to.eq(signers.alice.address); // owner
+    expect(metadata[5]).to.be.gt(0); // createdAt
+    progress(`Ticket metadata: ${metadata[0]} at ${metadata[1]}`);
 
     progress(`Call TicketVault.getEncryptedSeatNumber(${ticketId})...`);
     const encryptedSeatHandle = await ticketVaultContract.connect(signers.alice).getEncryptedSeatNumber(ticketId);

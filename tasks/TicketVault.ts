@@ -130,10 +130,12 @@ task("task:get-tickets", "Gets all tickets owned by the signer")
     for (const ticketId of ticketIds) {
       const metadata = await ticketVaultContract.getTicketMetadata(ticketId);
       console.log(`\nTicket #${ticketId}:`);
-      console.log(`  Event: ${metadata.eventName}`);
-      console.log(`  Venue: ${metadata.venue}`);
-      console.log(`  Date: ${metadata.date}`);
-      console.log(`  Owner: ${metadata.owner}`);
+      console.log(`  Event: ${metadata[0]}`); // eventName
+      console.log(`  Venue: ${metadata[1]}`); // venue
+      console.log(`  Date: ${metadata[2]}`); // date
+      console.log(`  Owner: ${metadata[3]}`); // owner
+      const createdDate = new Date(Number(metadata[5]) * 1000);
+      console.log(`  Created: ${createdDate.toLocaleString()}`);
     }
   });
 
@@ -316,8 +318,9 @@ task("task:get-all-tickets", "Gets total ticket count and summary")
       console.log(`\nTicket Summary:`);
       for (let i = 0; i < totalCount; i++) {
         const metadata = await ticketVaultContract.getTicketMetadata(i);
-        if (metadata.exists) {
-          console.log(`  Ticket #${i}: ${metadata.eventName} at ${metadata.venue}`);
+        if (metadata[4]) { // exists
+          const createdDate = new Date(Number(metadata[5]) * 1000);
+          console.log(`  Ticket #${i}: ${metadata[0]} at ${metadata[1]} (Created: ${createdDate.toLocaleDateString()})`);
         }
       }
     }
