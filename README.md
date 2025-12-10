@@ -17,7 +17,7 @@ TicketLock Vault is a decentralized application that leverages **FHEVM (Fully Ho
 ## 🎬 Demo
 
 ### 🌐 Live Demo
-**Try it now:** [https://ticketlock-vault.vercel.app/](https://ticketlock-vault.vercel.app/)
+**Try it now:** [https://ticketlock-vault-xse.vercel.app/](https://ticketlock-vault-xse.vercel.app/)
 
 ### 📹 Video Demonstration
 Watch the full demo showcasing ticket creation, encryption, and lock/unlock functionality:
@@ -272,7 +272,7 @@ npm run coverage
 
 **Contract Address (Sepolia)**: `0x...` *(Update after deployment)*
 
-**Frontend**: [https://ticketlock-vault.vercel.app/](https://ticketlock-vault.vercel.app/)
+**Frontend**: [https://ticketlock-vault-xse.vercel.app/](https://ticketlock-vault-xse.vercel.app/)
 
 **Network**: Ethereum Sepolia Testnet
 
